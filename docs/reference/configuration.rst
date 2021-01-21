@@ -36,6 +36,94 @@ admin or intranet interface.
     To use Site API view configuration automatically on pages rendered from eZ Platform URL aliases,
     you need to enable it manually per siteaccess.
 
+Cross-siteaccess routing
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Cross-siteaccess routing is a feature that enables automatic linking to Locations in the same
+Repository, but across different siteaccesses. This is intended for single Repository multisite
+installations, where multiple siteaccesses are configured with different Content tree root Location
+IDs. The feature is implemented at the router level, so it will work both from PHP and Twig.
+
+.. note::
+
+    Cross-siteaccess routing is enabled by default, but if needed it can be disabled per siteaccess
+    with ``ng_cross_siteaccess_routing`` option.
+
+The logic of choosing the right siteaccess is not straightforward, and resolving the best matching
+one considers the following:
+
+- Current siteaccess Content tree root Location ID
+- Current siteaccess prioritized languages configuration
+- Current siteaccess excluded URI prefixes configuration
+- Matching siteaccess Content tree root Location ID
+- Matching siteaccess prioritized languages configuration
+- Matching siteaccess translation siteaccesses configuration
+- Location subtree
+- Location Content translations
+- Location Content always available flag
+
+.. note::
+
+    The matching process is described below, but the rules are dense and it might be hard to
+    understand all the implications right away. To better understand the matching logic, you are
+    encouraged to look into the test cases. They were written to simulate the siteaccess
+    configuration and to be easy to read.
+
+Current siteaccess will always be preferred if it matches the context, meaning given Location's
+subtree, available translations and always available flag. Otherwise, the siteaccess will be chosen
+among the siteaccesses that do match the given context.
+
+Current siteaccess is also a fallback that is used when nothing of the below matches the context.
+
+In case when multiple (non current) siteaccesses match the context, the best matching one will be
+chosen according to the current siteaccess configured prioritized languages. The matching logic will
+respect the order/priority of the configured prioritized languages for both current and potentially
+matching siteaccess, resulting in the selection of a siteaccess that can allows highest possible
+language of the current siteaccess at a highest possible position on the matching siteaccess. The
+important think to note here is that configured prioritized languages take precedence over the
+available languages of the Location, which means that in some cases, the resulting siteaccess will
+be the best one in regard to the prioritized languages, but not the best one in regard to the
+Location's available languages.
+
+It's possible that matching a siteaccess by the current siteaccess prioritized languages will
+produce no result. In that case all siteaccesses matching the context will be checked, according to
+their order in the configured siteaccess list.
+
+It's also possible that multiple siteaccess will match the language configuration equally well. In
+that case, the first one according to the configured siteaccess list will be used.
+
+If so configured, matching siteaccess translation siteaccesses will be also considered in selecting
+the siteaccess that will be used for linking. Only the most prioritized language of the translation
+siteaccess will be considered, and matching will use current siteaccess prioritized languages to
+select the best one. In case when that produces no result, all translation siteaccesses will be
+checked in the order they are configured. As this behaviour is not commonly desired, it's disabled
+by default, and can be turned on per siteaccess with
+``ng_cross_siteaccess_routing_prefer_translation_siteaccess`` option.
+
+If ``excluded_uri_prefixes`` options is used on a siteaccess, it should be separately configured for
+cross-siteaccess router with the corresponding Location ID. This is needed because
+``excluded_uri_prefixes`` is used for matching an URL, and as such is not really usable for
+generating an URL. Counterparts of the "excluded URI prefixes" for generating cross-siteaccess links
+are called "external subtree roots", and they can be configured per siteaccess with
+``ng_cross_siteaccess_routing_external_subtree_roots`` option. If the Location is found to be under
+the configured external tree root, the link to it will be generated on the current siteaccess.
+
+Host part of the resulting URL will always be generated if requested, but otherwise only if
+necessary, meaning only if it's different from the current host. This is also valid for ``path``
+function in Twig, as otherwise it would not be possible to correctly link to a Location on a
+siteaccess with a different host.
+
+All configuration options, showing defaults:
+
+.. code-block:: yaml
+
+    ezpublish:
+        system:
+            frontend:
+                ng_cross_siteaccess_routing: true
+                ng_cross_siteaccess_routing_prefer_translation_siteaccess: false
+                ng_cross_siteaccess_routing_external_subtree_roots: []
+
 Site API Content views
 ~~~~~~~~~~~~~~~~~~~~~~
 

@@ -31,6 +31,28 @@ class BaseOptions extends AbstractParser
             ->booleanNode('ng_xmltext_embed_without_subrequest')
             ->info('Controls whether RichText and XmlText embed rendering should use a subrequest')
             ->end();
+
+        $nodeBuilder
+            ->booleanNode('ng_cross_siteaccess_routing')
+            ->info('Controls whether cross-siteaccess router will be used')
+            ->end();
+
+        $nodeBuilder
+            ->booleanNode('ng_cross_siteaccess_routing_prefer_translation_siteaccess')
+            ->info('Controls whether translation siteaccesses will be preferred for generating links')
+            ->end();
+
+        /* @noinspection NullPointerExceptionInspection */
+        $nodeBuilder
+            ->arrayNode('ng_cross_siteaccess_routing_external_subtree_roots')
+                ->info('A list of allowed subtree root Location IDs external to the subtree root of the current siteaccess')
+                ->defaultValue([])
+                ->children()
+                    ->integerNode('id')
+                        ->info('Location ID')
+                    ->end()
+                ->end()
+            ->end();
     }
 
     public function mapConfig(array &$scopeSettings, $currentScope, ContextualizerInterface $contextualizer): void
@@ -39,6 +61,9 @@ class BaseOptions extends AbstractParser
         $this->contextualize('ng_fallback_without_subrequest', $scopeSettings, $currentScope, $contextualizer);
         $this->contextualize('ng_richtext_embed_without_subrequest', $scopeSettings, $currentScope, $contextualizer);
         $this->contextualize('ng_xmltext_embed_without_subrequest', $scopeSettings, $currentScope, $contextualizer);
+        $this->contextualize('ng_cross_siteaccess_routing', $scopeSettings, $currentScope, $contextualizer);
+        $this->contextualize('ng_cross_siteaccess_routing_prefer_translation_siteaccess', $scopeSettings, $currentScope, $contextualizer);
+        $this->contextualize('ng_cross_siteaccess_routing_external_subtree_roots', $scopeSettings, $currentScope, $contextualizer);
     }
 
     private function contextualize(

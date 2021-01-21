@@ -1,0 +1,37 @@
+parameters:
+    netgen.ezplatform_site.routing.excluded_siteaccess_group_names: []
+    netgen.ezplatform_site.routing.excluded_siteaccess_names: []
+    netgen.ezplatform_site.routing.recursion_limit: 2
+
+services:
+    netgen.ezplatform_site.routing.siteaccess_resolver:
+        class: Netgen\Bundle\EzPlatformSiteApiBundle\Routing\SiteaccessResolver
+        arguments:
+            - '@ezpublish.api.persistence_handler'
+            - '%netgen.ezplatform_site.routing.excluded_siteaccess_group_names%'
+            - '%netgen.ezplatform_site.routing.excluded_siteaccess_names%'
+            - '%netgen.ezplatform_site.routing.recursion_limit%'
+        calls:
+            - [ setConfigResolver, [ '@ezpublish.config.resolver' ] ]
+            - [ setSiteaccess, [ '@ezpublish.siteaccess' ] ]
+            - [ setSiteaccessList, [ '%ezpublish.siteaccess.list%' ] ]
+            - [ setSiteaccessGroupsBySiteaccess, [ '%ezpublish.siteaccess.groups_by_siteaccess%' ] ]
+        lazy: true
+
+    netgen.ezplatform_site.routing.urlalias_router:
+        decorates: ezpublish.urlalias_router
+        class: Netgen\Bundle\EzPlatformSiteApiBundle\Routing\UrlAliasRouter
+        arguments:
+            - '@ezpublish.api.service.location'
+            - '@ezpublish.api.service.url_alias'
+            - '@ezpublish.api.service.content'
+            - '@ezpublish.urlalias_generator'
+            - '@netgen.ezplatform_site.routing.siteaccess_resolver'
+            - '@?router.request_context'
+            - '@?logger'
+        calls:
+            - [ setConfigResolver, [ '@ezpublish.config.resolver' ] ]
+            - [ setSiteaccess, [ '@ezpublish.siteaccess' ] ]
+        tags:
+            - { name: router, priority: 200 }
+        lazy: true

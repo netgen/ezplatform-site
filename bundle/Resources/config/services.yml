@@ -24,24 +24,6 @@ services:
         alias: netgen.ezplatform_site.controller.content.view
         public: true
 
-    netgen.ezplatform_site.routing.content_url_alias_router:
-        class: Netgen\Bundle\EzPlatformSiteApiBundle\Routing\ContentUrlAliasRouter
-        public: false
-        arguments:
-            - "@ezpublish.urlalias_generator"
-            - "@?router.request_context"
-        tags:
-            - { name: router, priority: 200 }
-
-    netgen.ezplatform_site.routing.location_url_alias_router:
-        class: Netgen\Bundle\EzPlatformSiteApiBundle\Routing\LocationUrlAliasRouter
-        public: false
-        arguments:
-            - "@ezpublish.urlalias_generator"
-            - "@?router.request_context"
-        tags:
-            - { name: router, priority: 200 }
-
     netgen.ezplatform_site.param_converter.location:
         class: Netgen\Bundle\EzPlatformSiteApiBundle\Converter\ContentParamConverter
         arguments:

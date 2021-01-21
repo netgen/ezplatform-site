@@ -40,6 +40,8 @@ parameters:
     ezsettings.default.ng_fallback_without_subrequest: false
     ezsettings.default.ng_richtext_embed_without_subrequest: false
     ezsettings.default.ng_xmltext_embed_without_subrequest: false
+    ezsettings.default.ng_cross_siteaccess_routing: true
+    ezsettings.default.ng_cross_siteaccess_routing_prefer_translation_siteaccess: false
     ezsettings.default.ng_named_query: []
     ezsettings.default.ngcontent_view: []
     ezsettings.default.ngcontent_view_defaults:

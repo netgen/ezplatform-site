@@ -24,7 +24,6 @@ class NetgenEzPlatformSiteApiBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new AggregateRepositoryPass());
-        $container->addCompilerPass(new DefaultViewActionOverridePass());
         $container->addCompilerPass(new InvalidRedirectConfigurationListenerPass());
         $container->addCompilerPass(new PreviewControllerOverridePass());
         $container->addCompilerPass(new RelationResolverRegistrationPass());
